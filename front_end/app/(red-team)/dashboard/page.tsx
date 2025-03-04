@@ -12,7 +12,7 @@ function Page() {
     }
   }, [isMobile, setOpenMobile]);
   return (
-    <div className="h-[calc(100vh-70px)] lg:h-[calc(100vh-70px)] overflow-y-auto  max-w-screen w-screen md:max-w-full md:w-full  bg-black text-white p-1">
+    <div className="h-[calc(100vh-70px)] lg:h-[calc(100vh-70px)] overflow-y-auto  bg-black text-white p-1">
       <StudentDashboard />
     </div>
   );

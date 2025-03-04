@@ -31,14 +31,14 @@ import { useGetTodayAttendance } from "@/utils/hooks/query-hooks/attendance/use-
 import { useUpdateAttendance } from "@/utils/hooks/mutate-hooks/attendance/use-update-attendance";
 import { Loader } from "../ui/Loader";
 
-interface AttendanceRecordType {
+export interface AttendanceRecordType {
   userId: string;
   isPresent: boolean;
   reason?: string;
   recordedAt: Date;
 }
 
-interface AttendanceTrackerRequest {
+export interface AttendanceTrackerRequest {
   attendance: AttendanceRecordType[];
   date: string;
   field: string;

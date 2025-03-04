@@ -14,6 +14,7 @@ import (
 	"github.com/Abhishekh669/backend/configuration"
 	"github.com/Abhishekh669/backend/model"
 	"github.com/Abhishekh669/backend/services"
+	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/sessions"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -38,26 +39,30 @@ func generateState() (string, error) {
 	return base64.URLEncoding.EncodeToString(b), nil
 }
 
-// func generateJwtToken(user model.User) (string, error) {
-// 	jwtSecret := []byte(os.Getenv("SESSION_SECRET"))
+func generateJwtToken(user model.User) (string, error) {
+	jwtSecret := []byte(os.Getenv("SESSION_SECRET"))
+	if len(jwtSecret) == 0 {
+		return "", fmt.Errorf("SESSION_SECRET environment variable is not set")
+	}
 
-// 	claims := jwt.MapClaims{
-// 		"sub": user.ID,
-// 		"exp": time.Now().Add(7 * 24 * time.Hour).Unix(),
-// 		"iat": time.Now().Unix(),
-// 	}
+	claims := jwt.MapClaims{
+		"sub":   user.ID,
+		"email": user.Email,
+		"exp":   time.Now().Add(7 * 24 * time.Hour).Unix(),
+		"iat":   time.Now().Unix(),
+	}
 
-// 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-// 	signedToken, err := token.SignedString(jwtSecret)
+	signedToken, err := token.SignedString(jwtSecret)
 
-// 	if err != nil {
-// 		return "", err
-// 	}
+	if err != nil {
+		return "", err
+	}
 
-// 	return signedToken, nil
+	return signedToken, nil
 
-// }
+}
 
 var server_state string
 
@@ -162,9 +167,16 @@ func AuthGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to save session", http.StatusInternalServerError)
 		return
 	}
+
+	token, err := generateJwtToken(newUser)
+	if err != nil {
+		http.Error(w, "Failed to generate session", http.StatusInternalServerError)
+		return
+	}
 	responseData := map[string]interface{}{
-		"message": "user authenticated successfully",
-		"user":    newUser,
+		"message":    "user authenticated successfully",
+		"user":       newUser,
+		"chat_token": token,
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

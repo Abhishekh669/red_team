@@ -46,7 +46,9 @@ export async function GET(request: Request) {
     }
 
 
-    const {user} = await response.json();
+    const {user, chat_token} = await response.json();
+
+    console.log("this is the chat token for the chat app : ",chat_token)
 
 
     if(!user) {
