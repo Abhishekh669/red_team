@@ -106,7 +106,10 @@ func GetAllConversationMessagesHandler(w http.ResponseWriter, r *http.Request) {
 		query.LastID = lastID
 	}
 
+	fmt.Println("searching messages : ")
+
 	messages, err := services.GetAllConversationMessages(ObjectConversationId, query.LastID, query.Limit)
+	fmt.Println("error is  : ", err)
 
 	if err != nil {
 		http.Error(w, "Error : failed to get messages", http.StatusInternalServerError)

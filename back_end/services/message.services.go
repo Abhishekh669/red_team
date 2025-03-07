@@ -83,12 +83,12 @@ func populateMessageDetails(message model.Message) (bson.M, error) {
 }
 
 func populatedMessagesDetails(message bson.M) (bson.M, error) {
-	senderID, ok := message["sender"].(primitive.ObjectID)
+	senderID, ok := message["senderId"].(primitive.ObjectID)
 	if !ok {
 		return nil, fmt.Errorf("invalid sender ID")
 	}
 
-	receiverID, ok := message["receiver"].(primitive.ObjectID)
+	receiverID, ok := message["receiverId"].(primitive.ObjectID)
 	if !ok {
 		return nil, fmt.Errorf(("invlaid reciever ID"))
 	}
@@ -129,7 +129,8 @@ func populatedMessagesDetails(message bson.M) (bson.M, error) {
 	populatedMessage := bson.M{
 		"_id":            message["_id"],
 		"conversationId": message["conversationId"],
-		"body":           message["body"],
+		"text":           message["text"],
+		"image":          message["image"],
 		"sender": map[string]interface{}{
 			"_id":      sender.ID,
 			"name":     sender.Name,
@@ -149,7 +150,8 @@ func populatedMessagesDetails(message bson.M) (bson.M, error) {
 			"codeName": receiver.CodeName,
 		},
 
-		"seenBy": seenByUsers,
+		"seenBy":    seenByUsers,
+		"createdAt": message["createdAt"],
 	}
 	return populatedMessage, nil
 }
@@ -170,7 +172,10 @@ func GetAllConversationMessages(id primitive.ObjectID, lastID primitive.ObjectID
 		"conversationId": id,
 	}
 
+	fmt.Println("i have got this conversation id : ", id)
+
 	count, err := message_collection.CountDocuments(ctx, filter)
+	fmt.Println("this ishte conversation message count : ", count)
 	if err != nil {
 		return map[string]interface{}{}, fmt.Errorf("failed to count messages : %v", err)
 	}
@@ -180,6 +185,7 @@ func GetAllConversationMessages(id primitive.ObjectID, lastID primitive.ObjectID
 	}
 
 	options := options.Find().SetSort(bson.D{{Key: "createdAt", Value: -1}}).SetLimit(int64(limit))
+	fmt.Println("fine before here too")
 	cursor, err := message_collection.Find(ctx, filter, options)
 	if err != nil {
 		return map[string]interface{}{}, fmt.Errorf("failed to get messages: %v", err)
@@ -210,6 +216,8 @@ func GetAllConversationMessages(id primitive.ObjectID, lastID primitive.ObjectID
 		"messages":      messages,
 		"totalMessages": count,
 	}
+
+	fmt.Println("this is reposne : ", response)
 
 	return response, nil
 }

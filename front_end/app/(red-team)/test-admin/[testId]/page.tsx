@@ -97,7 +97,6 @@ export default function TestDataPage() {
   
 
   const { data: testData, isLoading: testDataLoading } = useGetTestById(testId);
-  console.log("this is hte test data : ", testData);
   const { data: allUsers, isLoading: usersLoading } = useGetUsers();
   const { mutate: update_test_score, isPending: updatingTestScore } =
     useUpdateTestScore();
@@ -226,7 +225,6 @@ export default function TestDataPage() {
     setIsSaving(true);
 
     // Mock API call - replace with actual API call
-    console.log("this is the values to be updated okie : ", editedScores);
     update_test_score(
       { serverValue: editedScores, id: testId },
       {
@@ -255,7 +253,6 @@ export default function TestDataPage() {
     if (!testData) return;
 
     const newScores = { ...editedScores };
-    console.log("this ishte new editing scores okie for adding : ",newScores)
 
     students.forEach((student: UserType) => {
       if (!newScores[student._id]) {
@@ -266,16 +263,13 @@ export default function TestDataPage() {
         };
       }
     });
-    console.log("this is the new students : ", newScores)
 
     setEditedScores(newScores);
-    console.log("this is the new editied scores : ",editedScores)
     setIsEditing(true);
     setHasStudentData(true)
     setActiveTab("scores");
   };
 
-  console.log("this is hte editing status : ",isEditing)
 
   const handleCancelEdit = () => {
     if (hasUnsavedChanges) {
@@ -320,7 +314,6 @@ export default function TestDataPage() {
     });
   // Check if there is any student data
   
-  console.log('this ishte edited scores : ',editedScores)
 
   if(!chartData || usersLoading || testDataLoading)return <Loader />
 
@@ -361,7 +354,6 @@ export default function TestDataPage() {
       </div>
     );
   }
-  console.log("thisi sh chartData  : ", chartData);
 
   return (
     <TooltipProvider>
@@ -516,7 +508,6 @@ export default function TestDataPage() {
                       <TableBody>
                         { editedScores && Object.entries(editedScores).map(
                           ([userId, data]) => {
-                            console.log("userId : ", userId, "data : ", data);
                             const student = students?.find(
                               (s: UserType) => s._id === userId
                             );

@@ -16,7 +16,6 @@ interface OnboardingType{
 }
 
 export const onboard_user = async(values : OnboardingType) =>{
-    console.log("this is hte values for onboarding : ", values)
     const session_cookie = await get_cookies("__session");
       if (!session_cookie) {
         return {

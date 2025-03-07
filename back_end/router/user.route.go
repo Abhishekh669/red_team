@@ -15,7 +15,7 @@ func UserRouter() *mux.Router {
 	router.HandleFunc("/api/user/onboard", controller.OnboardingUserHandler).Methods("POST")
 	router.HandleFunc("/api/user/{id}", controller.GetUserByIdHandler).Methods("GET")
 	router.HandleFunc("/api/user/attendance/all", controller.GetAllAttendanceHandler).Methods("GET")
-	router.HandleFunc("/api/user/get/test", controller.GetTestDataByUserIdHandler).Methods("GET")
+	router.HandleFunc("/api/user/get/test/{id}", controller.GetTestDataByUserIdHandler).Methods("GET")
 	router.HandleFunc("/api/user/fuck", func(w http.ResponseWriter, r *http.Request) {
 		// Set the content type to HTML
 		w.Header().Set("Content-Type", "text/html")

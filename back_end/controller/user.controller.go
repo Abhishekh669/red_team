@@ -27,15 +27,10 @@ func GetTestDataByUserIdHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Allow-Control-Allow-Methods", "GET")
 
-	sessionData, err := configuration.GetSessionData(r)
+	params := mux.Vars(r)
+	userId := params["id"]
 
-	if err != nil {
-		http.Error(w, "invalid session", http.StatusBadRequest)
-		return
-
-	}
-
-	ObjectUserId, err := primitive.ObjectIDFromHex(sessionData.UserId)
+	ObjectUserId, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
 		http.Error(w, "failed to parse user id ", http.StatusForbidden)
 		return
@@ -48,7 +43,10 @@ func GetTestDataByUserIdHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := services.GetTestDataByUserId(sessionData.UserId)
+	fmt.Println("i am successfulll", ObjectUserId)
+
+	result, err := services.GetTestDataByUserId(userId)
+	fmt.Println("this is error : ", err)
 	if err != nil {
 		http.Error(w, "failed to get attendance  data", http.StatusNotFound)
 		return

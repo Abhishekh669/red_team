@@ -167,7 +167,6 @@ export const create_test = async(values : TestType) =>{
       error: "user not authenticated",
     };
   }
-  console.log("this are the values : ",values)
   try {
     const res = await axios.post(`${backendUrl}/api/admin/test/create`,values, {
       withCredentials: true,
@@ -358,7 +357,6 @@ export const set_or_delete_user = async ({
         },
       }
     );
-    console.log("this is hte response : ", res.data);
 
     if (res.statusText != "OK") {
       return {
@@ -426,20 +424,13 @@ export const delete_user = async (id: string) => {
 };
 
 export const verify_user = async (id: string) => {
-  console.log("i am for verifying hte user ");
   const session_cookie = await get_cookies("__session");
   const admin_cookie = await get_cookies("admin_token");
-  console.log(
-    "thi ish te sesion and admi cookie : ",
-    session_cookie,
-    admin_cookie
-  );
   if (!session_cookie || !admin_cookie) {
     return {
       error: "user not authenticated",
     };
   }
-  console.log("fine till now");
   try {
     const res = await axios.get(`${backendUrl}/api/admin/verify/${id}`, {
       withCredentials: true,
@@ -536,7 +527,6 @@ export const login_admin = async (values: AdminType) => {
     }
 
     const cookie = res.headers["set-cookie"] || [];
-    console.log("this is the cookies : ", cookie);
     const admin_cookie = cookie.find((cookie: string) =>
       cookie.trim().startsWith("admin_token=")
     );
@@ -551,7 +541,6 @@ export const login_admin = async (values: AdminType) => {
 
     let session_name = cookie_value.split("=")[0];
     let session_token = cookie_value.slice(session_name.length + 1);
-    console.log("this ishte ocokie : ", session_name, session_token);
 
     Cookies.set(session_name, session_token, {
       expires: 7,
@@ -624,10 +613,8 @@ export const create_admin = async (values: AdminType) => {
       },
     });
 
-    console.log("this the res header : ", res.headers);
 
     const data = await res.data;
-    console.log("this is the dat aafter creating admin : ", data);
     if (!data) {
       return { error: "failed to create admin" };
     }

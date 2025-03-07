@@ -113,7 +113,6 @@ export const createAbsentRequest = async (values: AbsentRequestType) => {
       error: "user not authenticated",
     };
   }
-  console.log("this are the values : ", values);
   try {
     const res = await axios.post(`${backendUrl}/api/student/absent`, values, {
       withCredentials: true,
@@ -142,7 +141,6 @@ export const createAbsentRequest = async (values: AbsentRequestType) => {
       creationStatus: JSON.stringify(data),
     };
   } catch (error : any) {
-    console.log("this ishte error in absetn : ",error?.response.data)
     return { error : error?.response.data };
   }
 };

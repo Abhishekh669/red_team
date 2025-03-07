@@ -28,7 +28,6 @@ function TestAdmin() {
     [user, usersLoading, allUsers?.users]
   );
 
-  console.log("this ish te data : ", testResult);
 
   return (
     <div className="h-[calc(100vh-70px)] lg:h-[calc(100vh-70px)] overflow-y-auto">

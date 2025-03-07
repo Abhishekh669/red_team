@@ -36,6 +36,28 @@ export const onboardingSchema = z.object({
 // Regex for international phone number format
 });
 
+export interface ConversationFromServer{
+  createdAt : Date,
+  groupImage ?: string,
+  name ?: string,
+  lastMessageAt ?: Date,
+  members : UserForConversation[],
+  _id : string
+}
+
+
+
+export interface UserForConversation{
+  address : string, 
+  codeName : string,
+  email : string,
+   field : string ,
+   image : string,
+   name : string,
+   _id : string,
+   conversationId : string,
+}
+
 
 export interface UserInMessageType{
   address : string, 
@@ -44,17 +66,19 @@ export interface UserInMessageType{
    field : string ,
    image : string,
    name : string,
-   _id : string
+   _id : string,
 }
 
 
 export interface MessageTypeFromServer{
-  body : string,
+  text : string,
   conversationId : string,
   seenBy : UserInMessageType[]
   sender : UserInMessageType
   receiver : UserInMessageType
   _id : string
+  createdAt : Date
+  image ?: string
 }
 
 

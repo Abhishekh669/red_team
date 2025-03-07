@@ -75,7 +75,6 @@ export const get_all_attendance = async() =>{
 
 
 export const update_attendance = async(values : UpdateAttendanceType) =>{
-  console.log("this ishte values : ",values)
   const session_cookie = await get_cookies("__session");
       const admin_cookie = await get_cookies("admin_token");
       if (!session_cookie || !admin_cookie) {

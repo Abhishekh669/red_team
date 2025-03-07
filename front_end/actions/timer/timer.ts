@@ -155,7 +155,6 @@ export const edit_workspace_timer_data = async (
       }
     );
 
-    console.log("this isht eupdate : repsonse : ", res);
 
     if (res.statusText != "OK") {
       return {
@@ -164,7 +163,6 @@ export const edit_workspace_timer_data = async (
     }
 
     const data = await res.data;
-    console.log("this is hte data in update : ", data);
     if (!data) {
       return { error: "failed to update data" };
     }
@@ -347,7 +345,6 @@ export const get_user_workspace_timers = async (id: string) => {
     };
   }
   try {
-    console.log(" i am going for api call", id);
     const res = await axios.get(`${backendUrl}/api/timer/workspace/${id}`, {
       withCredentials: true,
       headers: {
@@ -362,7 +359,6 @@ export const get_user_workspace_timers = async (id: string) => {
     }
 
     const data = await res.data;
-    console.log("this ish te data  fo timers in workspaces: ", data);
 
     return {
       message: "successfully created timer",
@@ -374,14 +370,12 @@ export const get_user_workspace_timers = async (id: string) => {
 };
 
 export const create_timer = async (values: TimerCreateType) => {
-  console.log(" i m her");
   const session_cookie = await get_cookies("__session");
   if (!session_cookie) {
     return {
       error: "user not authenticated",
     };
   }
-  console.log("this is hte create itmer : ", values);
   try {
     const res = await axios.post(`${backendUrl}/api/timer`, values, {
       withCredentials: true,

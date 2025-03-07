@@ -5,14 +5,14 @@ import { get_cookies } from "@/lib/get-cookie";
 import axios from "axios";
 
 
-export const get_test_by_user_id= async () => {
+export const get_test_by_user_id= async (id : string) => {
   const session_cookie = await get_cookies("__session");
   if (!session_cookie) {
     return { error: "user not authenticated" }; // Return a response with an error message
   }
 
   try {
-    const res = await axios.get(`${backendUrl}/api/user/get/test`,{
+    const res = await axios.get(`${backendUrl}/api/user/get/test/${id}`,{
       withCredentials: true,
       headers: {
         Cookie: `__session=${session_cookie}`,

@@ -19,12 +19,93 @@ type PaginationQuery struct {
 	Offset int `json:"offset"`
 }
 
+func GetUserAllConversationHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Allow-Control-Allow-Methods", "GET")
+
+	sessionData, err := configuration.GetSessionData(r)
+
+	if err != nil {
+		http.Error(w, "invalid session", http.StatusBadRequest)
+		return
+
+	}
+
+	ObjectUserId, err := primitive.ObjectIDFromHex(sessionData.UserId)
+
+	if err != nil {
+		http.Error(w, "Failed to parse userid ", http.StatusInternalServerError)
+		return
+	}
+
+	currentUser, err := services.GetUserById(ObjectUserId)
+
+	if err != nil || currentUser.ID.IsZero() || currentUser.Email == "" {
+		http.Error(w, "User not found", http.StatusInternalServerError)
+		return
+	}
+
+	conversations, err := services.GetUserAllConversation(ObjectUserId)
+	if err != nil {
+		http.Error(w, "Failed to get conversations ", http.StatusInternalServerError)
+		return
+	}
+
+	var newResponse []map[string]interface{}
+
+	for _, conversation := range conversations {
+		var membersData []map[string]interface{}
+		for _, userId := range conversation.Members {
+			user, err := services.GetUserById(userId)
+			if err != nil {
+				http.Error(w, "Failed to get user  ", http.StatusInternalServerError)
+				return
+			}
+			data := map[string]interface{}{
+				"_id":      user.ID,
+				"name":     user.Name,
+				"email":    user.Email,
+				"address":  user.Address,
+				"field":    user.Field,
+				"image":    user.Image,
+				"codeName": user.CodeName,
+			}
+			membersData = append(membersData, data)
+		}
+		var newConversation map[string]interface{}
+		if conversation.IsGroup {
+			newConversation = map[string]interface{}{
+				"_id":           conversation.ID,
+				"members":       membersData,
+				"isGroup":       conversation.IsGroup,
+				"name":          conversation.Name,
+				"groupImage":    conversation.GroupImage,
+				"createdAt":     conversation.CreatedAt,
+				"lastMessageAt": conversation.LastMessageAt,
+			}
+
+		} else {
+			newConversation = map[string]interface{}{
+				"_id":           conversation.ID,
+				"members":       membersData,
+				"groupImage":    conversation.GroupImage,
+				"createdAt":     conversation.CreatedAt,
+				"lastMessageAt": conversation.LastMessageAt,
+			}
+		}
+		newResponse = append(newResponse, newConversation)
+
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(newResponse)
+
+}
+
 // Define default values for limit and offset
 
 func CreateChatHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("i am here")
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Println("Fialed ot get json")
 	w.Header().Set("Allow-Control-Allow-Methods", "POST")
 	var chatReq model.ChatRequest
 	if err := json.NewDecoder(r.Body).Decode(&chatReq); err != nil {
@@ -74,85 +155,121 @@ func CreateChatHandler(w http.ResponseWriter, r *http.Request) {
 		memberIDs = append(memberIDs, memberID)
 	}
 
-	// Query to check if the conversation already exists
+	isGroup := len(memberIDs) > 2
 
-	query := bson.M{"members": bson.M{"$all": memberIDs, "$size": 2}}
+	if !isGroup {
 
-	//check if conversation already exist in the db
+		// Query to check if the conversation already exists
 
-	chat_collection, err := configuration.GetCollection("chats")
-	if err != nil {
-		http.Error(w, "chat collection not found", http.StatusInternalServerError)
-		return
-	}
+		query := bson.M{"members": bson.M{"$all": memberIDs, "$size": 2}}
 
-	var existingChat model.Chat
+		//check if conversation already exist in the db
 
-	err = chat_collection.FindOne(context.Background(), query).Decode(&existingChat)
-
-	if err == nil {
-		aggegratePipeline := []bson.M{
-			{
-				"$match": query,
-			},
-			{
-				"$lookup": bson.M{
-					"from":         "users",
-					"localField":   "members",
-					"foreignField": "_id",
-					"as":           "user_details",
-				},
-			},
-		}
-		cursor, err := chat_collection.Aggregate(context.Background(), aggegratePipeline)
-
+		chat_collection, err := configuration.GetCollection("chats")
 		if err != nil {
-			http.Error(w, "Error populating user details", http.StatusInternalServerError)
+			http.Error(w, "chat collection not found", http.StatusInternalServerError)
 			return
 		}
 
-		var populatedChat model.Chat
+		var existingChat model.Chat
 
-		if cursor.Next(context.Background()) {
-			if err := cursor.Decode(&populatedChat); err != nil {
-				http.Error(w, "Failed to decode populated conversation", http.StatusInternalServerError)
+		err = chat_collection.FindOne(context.Background(), query).Decode(&existingChat)
+
+		if err == nil {
+			aggegratePipeline := []bson.M{
+				{
+					"$match": query,
+				},
+				{
+					"$lookup": bson.M{
+						"from":         "users",
+						"localField":   "members",
+						"foreignField": "_id",
+						"as":           "user_details",
+					},
+				},
+			}
+			cursor, err := chat_collection.Aggregate(context.Background(), aggegratePipeline)
+
+			if err != nil {
+				http.Error(w, "Error populating user details", http.StatusInternalServerError)
 				return
 			}
+
+			var populatedChat model.Chat
+
+			if cursor.Next(context.Background()) {
+				if err := cursor.Decode(&populatedChat); err != nil {
+					http.Error(w, "Failed to decode populated conversation", http.StatusInternalServerError)
+					return
+				}
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(populatedChat)
+			return
+
+		}
+
+		newChat := model.Chat{
+			Members: memberIDs,
+		}
+
+		created_chat, err := services.CreateChat(newChat)
+
+		if err != nil {
+			http.Error(w, "Failed to create conversation", http.StatusInternalServerError)
+			return
+		}
+
+		for _, memberId := range memberIDs {
+			users, err := configuration.GetCollection("users")
+			users.UpdateOne(
+				context.Background(),
+				bson.M{"_id": memberId},
+				bson.M{"$addToSet": bson.M{"conversations": created_chat.ID}},
+			)
+			if err != nil {
+				http.Error(w, "Failed to update user with new conversation", http.StatusInternalServerError)
+				return
+			}
+
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(populatedChat)
-		return
+		json.NewEncoder(w).Encode(created_chat)
+	} else {
+		newGroupChat := model.Chat{
+			Members:    memberIDs,
+			IsGroup:    true,
+			Name:       chatReq.Name,
+			GroupImage: chatReq.GroupImage,
+		}
 
-	}
-
-	newChat := model.Chat{
-		Members: memberIDs,
-	}
-
-	created_chat, err := services.CreateChat(newChat)
-
-	if err != nil {
-		http.Error(w, "Failed to create conversation", http.StatusInternalServerError)
-		return
-	}
-
-	for _, memberId := range memberIDs {
-		users, err := configuration.GetCollection("users")
-		users.UpdateOne(
-			context.Background(),
-			bson.M{"_id": memberId},
-			bson.M{"$addToSet": bson.M{"conversations": created_chat.ID}},
-		)
+		newGroup, err := services.CreateChat(newGroupChat)
 		if err != nil {
-			http.Error(w, "Failed to update user with new conversation", http.StatusInternalServerError)
+			http.Error(w, "Failed to create conversation", http.StatusInternalServerError)
 			return
 		}
 
-	}
+		for _, memberId := range memberIDs {
+			users, err := configuration.GetCollection("users")
+			users.UpdateOne(
+				context.Background(),
+				bson.M{"_id": memberId},
+				bson.M{"$addToSet": bson.M{"conversations": newGroup.ID}},
+			)
+			if err != nil {
+				http.Error(w, "Failed to update user with new conversation", http.StatusInternalServerError)
+				return
+			}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(created_chat)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(newGroup)
+
+	}
 
 }
 
@@ -194,107 +311,26 @@ func GetConversationByIdHandler(w http.ResponseWriter, r *http.Request) {
 		members = append(members, user)
 	}
 
-	//paginate messages
-
-	// var query PaginationQuery
-
-	// query.Limit = 4
-	// query.Offset = 0
-
-	// // Fetch limit and offset from query parameters
-	// limitStr := r.URL.Query().Get("limit")
-	// offsetStr := r.URL.Query().Get("offset")
-
-	// // If limit is provided, use it, but make sure it's within bounds (e.g., max limit of 3)
-	// if limitStr != "" {
-	// 	limit, err := strconv.Atoi(limitStr)
-	// 	if err != nil {
-	// 		http.Error(w, "Invalid limit", http.StatusBadRequest)
-	// 		return
-	// 	}
-	// 	query.Limit = limit
-	// }
-
-	// // If offset is provided, use it
-	// if offsetStr != "" {
-	// 	offset, err := strconv.Atoi(offsetStr)
-	// 	if err != nil {
-	// 		http.Error(w, "Invalid offset", http.StatusBadRequest)
-	// 		return
-	// 	}
-	// 	query.Offset = offset
-	// }
-
-	// if query.Limit > 4 {
-	// 	query.Limit = 4
-	// }
-
-	// //fetch messages
-
-	// var populatedMessages []map[string]interface{}
-
-	// if len(conversation.Messages) > 0 {
-	// 	paginatedMessages := conversation.Messages[query.Offset:min(query.Offset+query.Limit, len(conversation.Messages))]
-
-	// 	fmt.Println("Paginated Message for now : ", paginatedMessages)
-
-	// 	for _, messageID := range paginatedMessages {
-	// 		message, err := services.GetMessageById(messageID)
-	// 		fmt.Println(":i am here ")
-
-	// 		if err != nil {
-	// 			http.Error(w, "failed to fetch message", http.StatusInternalServerError)
-	// 			return
-	// 		}
-	// 		fmt.Println("I am for sender")
-	// 		sender, err := services.GetUserById(message.Sender)
-
-	// 		if err != nil {
-	// 			http.Error(w, "failed to fetch sender", http.StatusInternalServerError)
-	// 			return
-	// 		}
-
-	// 		var seenByUsers []model.User
-
-	// 		for _, seenByID := range message.SeenBy {
-	// 			seenByUser, err := services.GetUserById(seenByID)
-
-	// 			if err != nil {
-	// 				http.Error(w, "failed to fetch seen_by user", http.StatusInternalServerError)
-	// 				return
-	// 			}
-
-	// 			seenByUsers = append(seenByUsers, seenByUser)
-
-	// 		}
-
-	// 		messageJson := map[string]interface{}{
-	// 			"_id":            message.ID,
-	// 			"conversationId": message.ConversationId,
-	// 			"body":           message.Body,
-	// 			"sender": map[string]interface{}{
-	// 				"_id":   sender.ID,
-	// 				"name":  sender.Name,
-	// 				"image": sender.Image,
-	// 				"email": sender.Email,
-	// 			},
-	// 			"seenBy": seenByUsers,
-	// 		}
-
-	// 		populatedMessages = append(populatedMessages, messageJson)
-
-	// 	}
-
-	// }
-
-	response := map[string]interface{}{
-		"_id":           conversation.ID,
-		"members":       members,
-		"createdAt":     conversation.CreatedAt,
-		"lastMessageAt": conversation.LastMessageAt,
+	if conversation.IsGroup {
+		response := map[string]interface{}{
+			"_id":           conversation.ID,
+			"members":       members,
+			"createdAt":     conversation.CreatedAt,
+			"lastMessageAt": conversation.LastMessageAt,
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	} else {
+		response := map[string]interface{}{
+			"_id":           conversation.ID,
+			"members":       members,
+			"isGroup":       conversation.IsGroup,
+			"groupImage":    conversation.GroupImage,
+			"createdAt":     conversation.CreatedAt,
+			"lastMessageAt": conversation.LastMessageAt,
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
 
 }

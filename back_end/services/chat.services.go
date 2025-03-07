@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func CreateChat(chat model.Chat) (model.Chat, error) {
@@ -97,5 +98,37 @@ func GetConversationById(chatId primitive.ObjectID) (model.Chat, error) {
 		}
 	}
 	return Chat, nil
+
+}
+
+func GetUserAllConversation(userId primitive.ObjectID) ([]model.Chat, error) {
+	chat_collection, err := configuration.GetCollection("chats")
+	if err != nil {
+		return []model.Chat{}, fmt.Errorf("could not get the chat collection: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	filter := bson.M{
+		"members": userId,
+	}
+
+	options := options.Find().SetSort(bson.D{{Key: "createdAt", Value: -1}})
+
+	cursor, err := chat_collection.Find(ctx, filter, options)
+
+	if err != nil {
+		return []model.Chat{}, fmt.Errorf("failed to get conversation")
+	}
+
+	defer cursor.Close(ctx)
+
+	var chats []model.Chat
+	if err := cursor.All(ctx, &chats); err != nil {
+		return []model.Chat{}, fmt.Errorf("failed to decode the result")
+	}
+
+	return chats, nil
 
 }

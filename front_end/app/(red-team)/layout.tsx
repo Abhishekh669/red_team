@@ -130,7 +130,7 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
             <Loader />
           ) : (
             <>
-              {user?.user?.isVerified || isAdmin ? (
+              {( (user?.user && user?.user?.isVerified) || isAdmin) ? (
                 <div className="w-full h-full bg-black">{children}</div>
               ) : (
                 <div className="w-full h-full flex justify-center items-center text-white">

@@ -40,7 +40,6 @@ export default function UserAbsenceRecords() {
   const router = useRouter();
   const { data: userAbsentRequests, isLoading: userAbsentRequestsLoading } = useGetUserAbsentById(userId);
   const { data: userData, isLoading: userDataLoading } = useGetUserById(userId);
-  console.log("this ishte user data ",userData)
   const {mutate : accept_absent_request, isPending : accepting} = useAcceptAbsentRequest()
   const {mutate : reject_absent_request, isPending : rejecting} = useRejectAbsentRequest()
   const {data : admin_token, isLoading : admin_token_loading} = useGetAdminByToken()

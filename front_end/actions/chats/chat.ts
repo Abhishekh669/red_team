@@ -9,6 +9,40 @@ interface ChatType {
     name?: string;
     groupImage?: string;
   }
+
+export const get_all_user_conversations = async() =>{
+  const session_cookie = await get_cookies("__session");
+  if (!session_cookie) {
+    return {
+      error: "user not authenticated",
+    };
+  }
+
+  try {
+    const res = await axios.get(`${backendUrl}/api/chat/user/all`,{
+        withCredentials : true,
+        headers : {
+            Cookie : `__session=${session_cookie}`
+        }
+    })
+
+    const data = await res.data || [];
+    
+    
+    return {
+        message : "successfully got chat",
+        chats : JSON.stringify(data)
+       
+    }
+    
+  } catch (error) {
+    return {
+        error : error || "failed to create chat"
+    }
+    
+  }
+
+}
   
 
 export const create_chat = async(values : ChatType) =>{

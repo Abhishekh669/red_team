@@ -10,7 +10,7 @@ import { UserType } from "../authorize/authorize-user";
 
 interface Messages {
   message: MessageTypeFromServer;
-  session: UserType;
+  session: UserType | null;
   seenMessageId: string | null;
   setSeenMessageId: (id: string | null) => void;
 }
@@ -35,7 +35,7 @@ export default function MessageBox({
         )}
         onClick={handleToggleSeen}
       >
-        {message?.body}
+        {message?.text}
       </div>
 
       {message?.sender._id === session?._id && isSeen && (

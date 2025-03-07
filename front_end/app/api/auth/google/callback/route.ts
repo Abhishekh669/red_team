@@ -17,7 +17,6 @@ export async function GET(request: Request) {
   const state = url.searchParams.get("state")?.toString();
   const code = url.searchParams.get("code");
 
-  console.log("state : ", state, "code : ", code);
 
   if (!state || !code) {
     return NextResponse.json(
@@ -27,6 +26,7 @@ export async function GET(request: Request) {
   }
 
   try {
+
     const response = await fetch(
       `${backendAuthCallback}?state=${state}&code=${code}`,
       {
@@ -48,10 +48,9 @@ export async function GET(request: Request) {
 
     const {user, chat_token} = await response.json();
 
-    console.log("this is the chat token for the chat app : ",chat_token)
 
 
-    if(!user) {
+    if(!user || !chat_token) {
       return NextResponse.json({error : "failed to get data"},{status : 404})
     }
 
@@ -91,6 +90,14 @@ export async function GET(request: Request) {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Use "none" for cross-site cookies in production
     });
 
+    nextResponse.cookies.set("chat_session", chat_token, {
+      path: "/",
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+      secure: process.env.NODE_ENV === "production", // Set to true in production
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Use "none" for cross-site cookies in production
+    });
+
     nextResponse.cookies.set("user_session", token_session, {
       path: "/",
       httpOnly: true,
@@ -108,3 +115,10 @@ export async function GET(request: Request) {
     );
   }
 }
+
+
+
+
+
+
+

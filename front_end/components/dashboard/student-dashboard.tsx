@@ -38,8 +38,6 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useSessionStore } from "@/utils/store/use-session-store";
@@ -50,11 +48,11 @@ import { ServerTestDataType } from "@/types";
 import { format } from "date-fns";
 import { object } from "zod";
 import WeeKBarData from "./Week-bar-data";
-import { all } from "axios";
 import {
   AttendanceRecordType,
   AttendanceTrackerRequest,
 } from "../attendance/attendance-dashboard";
+import { useUserId } from "@/utils/use-user-id";
 
 // Register ChartJS components
 ChartJS.register(
@@ -92,11 +90,12 @@ const isPassed = (score: number, passMarks: number): boolean => {
 // Define types based on the provided schema
 
 export default function StudentDashboard() {
+  const userId = useUserId();
   const [publicKey, setPublicKey] = useState("");
   const [privateKey, setPrivateKey] = useState("");
   const { data: allAttendance, isLoading: attendanceLoading } =
     useGetAllAttendance();
-  const { data: testData, isLoading: testDataLoading } = useGetTestByUserId();
+  const { data: testData, isLoading: testDataLoading } = useGetTestByUserId(userId);
   const { user } = useSessionStore();
   console.log("this is attendance : ", allAttendance);
 

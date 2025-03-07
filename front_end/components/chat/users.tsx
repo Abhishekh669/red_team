@@ -5,6 +5,7 @@ import { Loader } from '@/components/ui/Loader';
 import { useCreateChat } from '@/utils/hooks/mutate-hooks/chat/use-create-chat';
 import { useGetSession } from '@/utils/hooks/query-hooks/sessions/use-get-sessions'
 import { useGetUsers } from '@/utils/hooks/query-hooks/users/use-get-all-users';
+import { useSocketIOStore } from '@/utils/store/use-socket-io';
 import { useRouter } from 'next/navigation';
 import React  from 'react'
 
@@ -16,6 +17,7 @@ function Users() {
   const {data : users, isLoading : user_loading} = useGetUsers();
   const {mutate : create_chat} = useCreateChat();
   const router = useRouter();
+  const {setSelectedChat} = useSocketIOStore()
   
    
    
@@ -29,6 +31,7 @@ function Users() {
       onSuccess : (res) =>{
         if(res.chat && res.message){
           const data = JSON.parse(res.chat)
+          setSelectedChat(data._id)
           router.push(`/chat/${data._id}`)
         }
       }

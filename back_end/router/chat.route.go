@@ -9,5 +9,6 @@ func ChatRouter() *mux.Router {
 	router := mux.NewRouter()
 	router.HandleFunc("/api/chat", controller.CreateChatHandler).Methods("POST")
 	router.HandleFunc("/api/chat/{id}", controller.GetConversationByIdHandler).Methods("GET")
+	router.HandleFunc("/api/chat/user/all", controller.GetUserAllConversationHandler).Methods("GET")
 	return router
 }
