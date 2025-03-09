@@ -100,4 +100,32 @@ export interface ServerTestDataType {
 }
 
 
+export interface TodoType{
+  _id : string,
+  userId : string;
+  title: string;
+  position : number;
+  description : string;
+  tag : "HIGH" | "LOW" | "MEDIUM";
+  state : "PENDING" | "ONGOING" | "DONE";
+  createdAt : Date,
+  updatedAt : Date,
+}
+
+
+
+export enum TaskStatus {
+  PENDING = "PENDING",
+  ONGOING = "ONGOING",
+  DONE = "DONE"
+}
+
+
+export enum TaskTag {
+HIGH ="HIGH",
+MEDIUM="MEDIUM",
+LOW="LOW"
+}
+
+
 

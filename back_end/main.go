@@ -68,6 +68,7 @@ func main() {
 	r.PathPrefix("/api/timer").Handler(router.TimerRouter())
 	r.PathPrefix("/api/ws").Handler(router.SocketRouter())
 	r.PathPrefix("/api/student/absent").Handler(router.StudentAbsentRouter())
+	r.PathPrefix("/api/todo").Handler(router.TodoRouter())
 
 	// Start server with graceful shutdown
 	server := &http.Server{
