@@ -11,7 +11,7 @@ export  const fetch_user_all_todos = async() =>{
 
 export const useGetUserAllTodos = () =>{
     return useQuery({
-        queryKey : ["get_users_all_todos"],
+        queryKey : ["get_all_todos"],
         queryFn : () => fetch_user_all_todos(),
     })
 }

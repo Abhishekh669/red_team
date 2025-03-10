@@ -36,6 +36,20 @@ export const onboardingSchema = z.object({
 // Regex for international phone number format
 });
 
+
+export const todoSchema = z.object({
+  title: z
+    .string().trim()
+    .min(2, { message: "Minimum 2 characters are required" })
+    .max(15, { message: "Maximum of 15 characters is allowed" }),
+  description: z
+    .string().trim()
+    .min(2, { message: "Minimum 2 characters are required" })
+    .max(40, { message: "Maximum of 40 characters is allowed" }),
+  tag: z.enum(["HIGH", "MEDIUM", "LOW"], { required_error: "Priority is required" }),
+  state: z.enum([ "PENDING", "ONGOING", "DONE"]),
+});
+
 export interface ConversationFromServer{
   createdAt : Date,
   groupImage ?: string,

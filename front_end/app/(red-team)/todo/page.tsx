@@ -5,7 +5,6 @@ import React from "react";
 
 function TodoPage() {
   const { data: todos, isLoading: todosLoading } = useGetUserAllTodos();
-  console.log("this is all todos : ", todos);
   return (
     <div className="max-h-[calc(100vh-20px)] h-full  overflow-y-hidden  ">
       <div className="p-4">
