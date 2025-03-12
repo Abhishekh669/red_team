@@ -34,5 +34,17 @@ type UpdatePageData struct {
 type UpdatePageDataRequest struct {
 	ID      string `bson:"_id,omitempty" json:"_id,omitempty"`
 	Title   string `bson:"title" json:"title"`
-	Content string `bson:"content,omitempty" json:"conten,omitempty"`
+	Content string `bson:"content,omitempty" json:"content,omitempty"`
+}
+
+type UpdatePageWorkspace struct {
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	Title       string             `bson:"title" json:"title"`
+	Description string             `bson:"description,omitempty" json:"description,omitempty"`
+}
+
+type UpdatePageWorkspaceRequest struct {
+	ID          string `bson:"_id,omitempty" json:"_id,omitempty"`
+	Title       string `bson:"title" json:"title"`
+	Description string `bson:"description,omitempty" json:"description,omitempty"`
 }

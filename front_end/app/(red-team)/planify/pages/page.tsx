@@ -11,7 +11,6 @@ import toast from "react-hot-toast";
 export default function WorkspaceManager() {
 
   const {data : pages, isLoading : pagesLoading} = useGetUserAllPages();
-  console.log("this is pages : ",pages)
   const {mutate : create_page, isPending : creating} = useCreatePage();
   
   const [isDialogOpen, setIsDialogOpen] = useState(false)

@@ -26,8 +26,9 @@ export function EditWorkspaceModal({
   workspaceDescription,
   workspaceName,
 }: CreateWorkspaceModalProps) {
-  const [name, setName] = useState(workspaceDescription);
-  const [description, setDescription] = useState(workspaceName);
+  
+  const [name, setName] = useState(workspaceName);
+  const [description, setDescription] = useState(workspaceDescription);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

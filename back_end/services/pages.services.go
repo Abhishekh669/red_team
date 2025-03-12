@@ -10,7 +10,66 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+func DeletePageWorkspace(id primitive.ObjectID, userId primitive.ObjectID) (bool, error) {
+	pageCollection, err := configuration.GetCollection("pages")
+	if err != nil {
+		return false, fmt.Errorf("failed to get the pages collection: %v", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	defer cancel()
+
+	filter := bson.M{
+		"_id":    id,
+		"userId": userId,
+	}
+
+	result, err := pageCollection.DeleteOne(ctx, filter)
+	if err != nil {
+		return false, fmt.Errorf("failed to delete page: %v", err)
+	}
+
+	if result.DeletedCount == 0 {
+		return false, fmt.Errorf("no page found with the given ID")
+	}
+
+	return true, nil
+
+}
+
+func UpdatePageWorkspace(updateData model.UpdatePageWorkspace, userId primitive.ObjectID) (bool, error) {
+	pageCollection, err := configuration.GetCollection("pages")
+	if err != nil {
+		return false, fmt.Errorf("failed to get the pages collection: %v", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	defer cancel()
+
+	filter := bson.M{
+		"_id":    updateData.ID,
+		"userId": userId,
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			"title":       updateData.Title,
+			"description": updateData.Description,
+		},
+	}
+
+	result, err := pageCollection.UpdateOne(ctx, filter, update)
+
+	if err != nil || result.ModifiedCount == 0 {
+		return false, fmt.Errorf("failed to update page")
+	}
+
+	return true, nil
+
+}
 
 func GetUserAllPages(userId primitive.ObjectID) ([]model.PageModel, error) {
 	pageCollection, err := configuration.GetCollection("pages")
@@ -25,7 +84,9 @@ func GetUserAllPages(userId primitive.ObjectID) ([]model.PageModel, error) {
 		"userId": userId,
 	}
 
-	cursor, err := pageCollection.Find(ctx, filter)
+	options := options.Find().SetSort(bson.M{"createdAt": -1})
+
+	cursor, err := pageCollection.Find(ctx, filter, options)
 
 	if err != nil {
 		return []model.PageModel{}, fmt.Errorf("failed to get pages")

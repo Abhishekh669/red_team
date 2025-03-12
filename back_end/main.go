@@ -123,7 +123,7 @@ func ApplyMiddlewareExcept(excludedPaths ...string) mux.MiddlewareFunc {
 
 			// Session validation for all other routes
 			if !middleware.ValidateSession(w, r) {
-				http.Error(w, "Forbidden", http.StatusForbidden)
+				http.Error(w, "Forbidden ", http.StatusForbidden)
 				return
 			}
 

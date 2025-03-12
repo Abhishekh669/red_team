@@ -65,7 +65,7 @@ export interface ConversationFromServer{
 export interface PageModel {
   _id : string
   title: string
-  content?: string
+  content ?: string
   description: string
   type: string
   userId: string

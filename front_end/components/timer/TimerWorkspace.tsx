@@ -45,9 +45,8 @@ function TimerWorkspace({ workspaces }: TimerWorkspaceProps) {
         onSuccess : (res) =>{
             if(res.message && res.timerWorkspace){
                 const timer_workspace = JSON.parse(res.timerWorkspace)
-                console.log("this is hte timer workspace : ",timer_workspace)
                 toast.success(res.message)
-            }else{
+            }else if(res.error){
                 toast.error(res.error)
             }
         },

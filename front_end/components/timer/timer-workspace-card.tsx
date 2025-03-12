@@ -44,7 +44,7 @@ function TimerWorkspaceCard({ workspace }: TimerWorkspaceCardProps) {
       onSuccess: (res) => {
         if (res.message && res.status) {
           toast.success(res.message);
-        } else {
+        } else if(res.error) {
           toast.error(res.error);
         }
       },
@@ -61,7 +61,7 @@ function TimerWorkspaceCard({ workspace }: TimerWorkspaceCardProps) {
       onSuccess: (res) => {
         if (res.message && res.status) {
           toast.success(res.message);
-        } else {
+        } else if(res.error) {
           toast.error(res.error);
         }
       },
