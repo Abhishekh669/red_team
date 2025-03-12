@@ -55,6 +55,23 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
 
     }
     const handleEditPageWorkspace = (name : string, description : string) =>{
+      if(deleting || updating)return ;
+      update_page_workspace({
+        _id : workspace._id,
+        title : name,
+        description
+      },{
+        onSuccess: (res) => {
+          if (res.message && res.status) {
+            toast.success(res.message);
+          } else if(res.error) {
+            toast.error(res.error);
+          }
+        },
+        onError: () => {
+          toast.error("failed to update workspace");
+        },
+      })
       
 
     }
@@ -87,6 +104,7 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
               <DropdownMenuItem
                 className="hover:bg-gray-900/80 cursor-pointer"
                 onClick={() => setEditIsModalOpen(true)}
+                // disabled={updating}
               >
                 Edit
               </DropdownMenuItem>
