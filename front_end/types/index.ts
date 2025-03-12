@@ -3,6 +3,8 @@ import * as z from "zod";
 export const allFields = ['Security', 'Web-Development', 'Software-Developement','Mobile-App-Development', 'Data Science', 'Cloud', 'Networking']
 
 
+
+
 export const onboardingSchema = z.object({
   codeName: z
     .string()
@@ -57,6 +59,18 @@ export interface ConversationFromServer{
   lastMessageAt ?: Date,
   members : UserForConversation[],
   _id : string
+}
+
+
+export interface PageModel {
+  _id : string
+  title: string
+  content?: string
+  description: string
+  type: string
+  userId: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 

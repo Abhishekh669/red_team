@@ -59,7 +59,7 @@ export function TimerMainPage() {
       onSuccess: (res) => {
         if (res.message && res.timer) {
           toast.success("created new timer");
-        } else {
+        } else if(res.error){
           toast.error(res.error);
         }
       },

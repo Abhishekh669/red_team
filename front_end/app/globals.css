@@ -8,6 +8,13 @@ html, body {
   padding: 0px;
   /* overflow-x: hidden; */
 }
+
+.ProseMirror a {
+  color: blue;
+  text-decoration: underline;
+}
+
+
 ::-webkit-scrollbar {
   width: 8px;
 }
