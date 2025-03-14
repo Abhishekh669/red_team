@@ -157,3 +157,16 @@ LOW="LOW"
 
 
 
+export interface QuickTaskType{
+  _id : string,
+  title : string,
+  author ?: string,
+  completed : boolean,
+  favorite : boolean,
+  notes ?: string,
+  type : 'book' | 'todo',
+  createdAt : Date,
+}
+
+
+

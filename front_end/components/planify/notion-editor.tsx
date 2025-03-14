@@ -44,8 +44,8 @@ export default function NotionEditor({
   const id = usePageId();
   const { data: pageData, isLoading: pageDataLoading } = useGetPageById(id);
   const { mutate: update_page_data, isPending: updating } = useUpdatePageData();
-  const [title, setTitle] = useState(pageData?.pageData?.title || "");
-  const [content, setContent] = useState(pageData?.pageData?.content || "");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const router = useRouter();
 
   const editor = useEditor({

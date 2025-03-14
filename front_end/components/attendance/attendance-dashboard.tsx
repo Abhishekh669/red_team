@@ -216,7 +216,7 @@ const AttendanceTracker: React.FC = () => {
         onSuccess: (res) => {
           if (res.message && res.updatedAttendance) {
             toast.success(res.message);
-          } else {
+          } else if(res.error) {
             toast.error(res.error);
           }
         },
@@ -228,8 +228,11 @@ const AttendanceTracker: React.FC = () => {
       // Create new attendance
       create_attendance(attendanceData, {
         onSuccess: (res) => {
-          toast.success(res.message);
-          refetchTodayAttendance();
+          if(res.attendance && res.message){
+
+            toast.success(res.message);
+            refetchTodayAttendance();
+          }
         },
         onError: () => {
           toast.error("Failed to submit attendance");
