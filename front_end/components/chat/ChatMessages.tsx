@@ -2,10 +2,8 @@
 
 import type React from "react"
 import { useEffect, useRef, useState } from "react"
-import { format } from "date-fns"
 import { MessageTypeFromServer } from "@/types"
 import { UserType } from "../authorize/authorize-user"
-import Image from "next/image"
 import InfiniteScroll from "react-infinite-scroll-component"
 import { cn } from "@/lib/utils"
 import MessageBox from "../messages/message"

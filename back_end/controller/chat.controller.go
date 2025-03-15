@@ -140,6 +140,7 @@ func CreateChatHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User not found", http.StatusInternalServerError)
 		return
 	}
+	fmt.Println("this is chatreq : ", chatReq)
 
 	members := append(chatReq.Members, sessionData.UserId)
 
@@ -154,6 +155,8 @@ func CreateChatHandler(w http.ResponseWriter, r *http.Request) {
 
 		memberIDs = append(memberIDs, memberID)
 	}
+
+	fmt.Println("this ishte total memebres : ", memberIDs)
 
 	isGroup := len(memberIDs) > 2
 
@@ -311,7 +314,7 @@ func GetConversationByIdHandler(w http.ResponseWriter, r *http.Request) {
 		members = append(members, user)
 	}
 
-	if conversation.IsGroup {
+	if !conversation.IsGroup {
 		response := map[string]interface{}{
 			"_id":           conversation.ID,
 			"members":       members,
@@ -326,6 +329,7 @@ func GetConversationByIdHandler(w http.ResponseWriter, r *http.Request) {
 			"members":       members,
 			"isGroup":       conversation.IsGroup,
 			"groupImage":    conversation.GroupImage,
+			"name":          conversation.Name,
 			"createdAt":     conversation.CreatedAt,
 			"lastMessageAt": conversation.LastMessageAt,
 		}

@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 export interface MessageModel {
     _id : ObjectId,
     senderId : ObjectId,
-    receiverId : ObjectId,
+    receiverId ?: ObjectId,
     text ?: string,
     image ?: string,
     conversationId : ObjectId,
@@ -14,7 +14,7 @@ export interface MessageModel {
 
 export interface MessageModelRequest {
     senderId : string,
-    receiverId : string,
+    receiverId ?: string,
     text ?: string,
     image ?: string,
     conversationId : string,

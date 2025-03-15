@@ -7,6 +7,7 @@ import { useSessionStore } from "@/utils/store/use-session-store";
 import MessageInput from "./skeletons/MessageInput";
 import ChatHeader from "./ChatHeader";
 import { UserInMessageType } from "@/types";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 function ChatContainer() {
   const { user } = useSessionStore();
@@ -20,8 +21,7 @@ function ChatContainer() {
     subscribeToMessages,
     unsubscribeFromMessages,
     getChatByID,
-    isChatInfoLoading,
-    ChatInfo, 
+    ChatInfo,
     sendMessage,
   } = useChatStore();
 
@@ -45,7 +45,7 @@ function ChatContainer() {
   ]);
 
   const otherUser = useMemo(() => {
-    if (!user) return;
+    if (!user || ChatInfo?.isGroup) return;
     return (
       ChatInfo &&
       ChatInfo?.members.filter((u: UserInMessageType) => u._id !== user?._id)[0]
@@ -61,17 +61,37 @@ function ChatContainer() {
       conversationId: selectedChat,
       text: message.text || "",
       senderId: user._id,
-      receiverId: otherUser._id,
+      receiverId: otherUser?._id || "",
       image: message.image || "",
     };
     await sendMessage(values);
-
   };
 
-  console.log("this ishte socket : ",socket)
+  console.log("this ishte chat info for header  : ", ChatInfo);
   return (
     <div className="">
-      <ChatHeader otherUser={otherUser} />
+      {ChatInfo && (
+        <>
+          {ChatInfo.isGroup ? (
+            <>
+              <header className="bg-primary text-primary-foreground p-4 flex gap-x-2 items-center text-red-600">
+                <Avatar className="">
+                  <AvatarImage src={ChatInfo.image} alt={ChatInfo.name} />
+                  <AvatarFallback>
+                    {ChatInfo.name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+
+                <h1 className="text-2xl font-bold">{ChatInfo.name}</h1>
+              </header>
+            </>
+          ) : (
+            <>
+              <ChatHeader otherUser={otherUser} />
+            </>
+          )}
+        </>
+      )}
       <div className="">
         <div className="max-h-[80vh]">
           <ChatMessages

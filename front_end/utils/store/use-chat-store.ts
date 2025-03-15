@@ -43,8 +43,8 @@ export const useChatStore = create<ChatStoreType>((set, get) => ({
       const chatInfo = JSON.parse(res.chat);
       set({ChatInfo : chatInfo})
     }
-      else{
-        toast.error(res.error || "something went wrong")
+      else if(res.error){
+        toast.error(res.error as string || "something went wrong")
     }
 
     set({isChatInfoLoading : false})
@@ -58,8 +58,8 @@ export const useChatStore = create<ChatStoreType>((set, get) => ({
       const chats = JSON.parse(res.chats);
       set({conversations : chats})
     }
-    else{
-      toast.error(res.error || "something went wrong")
+    else if(res.error){
+      toast.error(res.error as string || "something went wrong")
     }
     set({isConversationLoading : false})
   },
@@ -79,9 +79,10 @@ export const useChatStore = create<ChatStoreType>((set, get) => ({
   },
   sendMessage : async (values : MessageType) =>{
     const res = await create_message(values);
+    const messages = get().messages || [];
     if(res.message && res.msg){
       const msg = JSON.parse(res.msg)
-      set({messages : [...get().messages, msg]})
+        set({messages : [...messages, msg]})
     }else{
       toast.error(res.error || "something went wrong")
     }

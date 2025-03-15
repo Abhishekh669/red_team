@@ -6,7 +6,11 @@ export const useCreateChat = () => {
   return useMutation({
     mutationFn: create_chat,
     
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if(res.chat && res.message){
+        queryClient.invalidateQueries({ queryKey: ["get_all_user_conversations"] })
+
+      }
     },
     onError: () => { },
     onSettled: () => { },

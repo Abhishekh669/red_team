@@ -8,7 +8,7 @@ export interface MessageType {
   conversationId: string;
   text?: string;
   senderId: string;
-  receiverId: string;
+  receiverId ?: string;
   image?: string;
 }
 
@@ -75,6 +75,7 @@ export const create_message = async (values: MessageType) => {
       error: "user not authenticated",
     };
   }
+  console.log("i am for creating message : ", values)
   try {
     const res = await axios.post(
       `${chatBackendUrl}/api/chat/message/create`,

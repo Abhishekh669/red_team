@@ -8,11 +8,13 @@ const populateMessageDetails = async (message: MessageModel) => {
   if (!senderData || !senderData._id || !senderData.email) {
     return null;
   }
-
-  const receiverData = await getUserById(message.receiverId);
+  let receiverData;
+ if(message.receiverId){
+   receiverData = await getUserById(message.receiverId);
   if (!receiverData || !receiverData._id || !receiverData.email) {
     return null;
   }
+ }
 
   var SeenByUsers = message.seenBy
   ? await Promise.all(
@@ -46,7 +48,7 @@ const populateMessageDetails = async (message: MessageModel) => {
       image: senderData.image,
       codeName: senderData.codeName,
     },
-    receiver: {
+    receiver: receiverData ? {
       _id: receiverData._id,
       name: receiverData.name,
       email: receiverData.email,
@@ -54,7 +56,7 @@ const populateMessageDetails = async (message: MessageModel) => {
       field: receiverData.field,
       image: receiverData.image,
       codeName: receiverData.codeName,
-    },
+    } : null,
     seenBy : SeenByUsers,
     createdAt : message.createdAt
   };

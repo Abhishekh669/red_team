@@ -27,10 +27,7 @@ func populateMessageDetails(message model.Message) (bson.M, error) {
 		return nil, fmt.Errorf("failed to get sender details: %v", err)
 	}
 
-	receiver, err := GetUserById(message.Receiver)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get receiver details: %v", err)
-	}
+	receiver, _ := GetUserById(message.Receiver)
 
 	// Handle the seenBy field (if available)
 
@@ -88,20 +85,14 @@ func populatedMessagesDetails(message bson.M) (bson.M, error) {
 		return nil, fmt.Errorf("invalid sender ID")
 	}
 
-	receiverID, ok := message["receiverId"].(primitive.ObjectID)
-	if !ok {
-		return nil, fmt.Errorf(("invlaid reciever ID"))
-	}
+	receiverID, _ := message["receiverId"].(primitive.ObjectID)
 
 	sender, err := GetUserById(senderID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get sender: %v", err)
 	}
 
-	receiver, err := GetUserById(receiverID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get receiver: %v", err)
-	}
+	receiver, _ := GetUserById(receiverID)
 
 	seenByIDs, ok := message["seenBy"].(bson.A)
 	if !ok {

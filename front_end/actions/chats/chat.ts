@@ -53,6 +53,8 @@ const session_cookie = await get_cookies("__session");
     };
   }
 
+  console.log("this is chat values : ", values)
+
   try {
     const res = await axios.post(`${backendUrl}/api/chat`,values,{
         withCredentials : true,

@@ -4,10 +4,18 @@ import { Loader } from "@/components/ui/Loader";
 import { redirect } from "next/navigation";
 import { useSocketIOStore } from "@/utils/store/use-socket-io";
 import { useEffect } from "react";
+import useSidebar from "@/components/ui/sidebar";
 
 function NewChatLayout({ children }: { children: React.ReactNode }) {
   const { data: userStatus, isLoading: userStatusLoading } =
     useGetChatByToken();
+     const { toggleSidebar, open, isMobile, setOpenMobile } = useSidebar();
+      useEffect(() => {
+        if(open) toggleSidebar();
+        if (isMobile) {
+          setOpenMobile(false);
+        }
+      }, [open, toggleSidebar, isMobile, setOpenMobile]);
 
   const { connectSocket, disconnectSocket } = useSocketIOStore();
   useEffect(() => {
