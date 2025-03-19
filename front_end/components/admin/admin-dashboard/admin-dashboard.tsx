@@ -395,8 +395,12 @@ export default function AdminDashboard() {
             </Avatar>
             <div className="grid gap-1">
               <CardTitle className="text-2xl text-white">
-                {user?.name} <span className="text-red-600">[</span> Admin{" "}
-                <span className="text-red-600">]</span>
+                {user?.name} {user.isAdmin && (
+                  <>
+                    <span className="text-red-600">[</span> Admin{" "}
+                      <span className="text-red-600">]</span>
+                  </>
+                )}
               </CardTitle>
               <CardDescription className="text-zinc-400">
                 {user?.email}

@@ -3,10 +3,14 @@
 import * as React from "react"
 import {
   BookOpen,
+  CalendarCheck,
   Clock,
   GalleryVerticalEnd,
   Key,
+  LayoutDashboard,
   LayoutDashboardIcon,
+  LayoutTemplate,
+  List,
   ListTodo,
   Loader,
   MessageSquareIcon,
@@ -46,7 +50,7 @@ const data = {
     },
     {
       title: "Chats",
-      url: "chat",
+      url: "new-chat",
       icon: MessageSquareIcon,
       
     },
@@ -88,9 +92,45 @@ const data = {
       
     },
     {
-      title: "Todo",
-      url: "todo",
-      icon: ListTodo,
+      title: "Planify",
+      url: "planify",
+      icon: CalendarCheck,
+      items :[
+          {
+            title : "Pages",
+            url : "pages",
+            icon : LayoutTemplate,
+            
+          },
+          {
+            title : "Projects",
+            url : "projects",
+            icon : LayoutDashboard
+          },
+          {
+            title : "Quick Notes",
+            url : "quick-notes",
+            icon : LayoutTemplate
+          },
+          {
+            title : "Task",
+            url : "tasks",
+            icon : LayoutTemplate,
+            item : [
+              {
+                title : "Quick Task",
+                url : "quick-task",
+                icon : LayoutTemplate
+              },
+              {
+                title : "Todo",
+                url : "todo",
+                icon : List
+              },
+            ]
+          },
+
+      ]
       
     },
     {

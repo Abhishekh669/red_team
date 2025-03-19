@@ -265,22 +265,14 @@ export default function StudentDashboard() {
 
   const attendanceCalendarData = generateAttendanceData();
 
-  // Theme for the calendar (only red for present, no color for absent)
   const calendarTheme = {
     light: ["#18181b", "#fecaca", "#f87171", "#ef4444", "#dc2626"], // Light theme with 5 colors
   };
-
-  // Data for the bar graph (marks obtained)
-
-  // Data for the line graph (trend of marks over time)
 
   const getWeekNumber = (date: Date) => {
     const day = date.getDate();
     return Math.ceil(day / 7);
   };
-  // Generate random attendance data for GitHub calendar
-
-  // Function to generate keys
   const generateKeys = () => {
     const mockPublicKey = "pk_" + Math.random().toString(36).substring(2, 15);
     const mockPrivateKey = "sk_" + Math.random().toString(36).substring(2, 15);
@@ -386,31 +378,6 @@ export default function StudentDashboard() {
                       Generate Keys
                     </Button>
 
-                    {/* {publicKey && (
-                    <div className="space-y-2">
-                      <div className="space-y-1">
-                        <div className="text-sm font-medium">Public Key</div>
-                        <div className="rounded-md bg-zinc-800 p-2 text-xs font-mono break-all text-red-400">
-                          {publicKey}
-                        </div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <div className="text-sm font-medium">Private Key</div>
-                        <div className="rounded-md bg-zinc-800 p-2 text-xs font-mono break-all text-red-400">
-                          {privateKey}
-                        </div>
-                      </div>
-
-                      <Button
-                        variant="outline"
-                        className="w-full border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        Download Keys
-                      </Button>
-                    </div>
-                  )} */}
                   </div>
                 </CardContent>
                 <CardFooter className="text-xs text-zinc-400">
@@ -448,8 +415,8 @@ export default function StudentDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-4 w-full flex-wrap h-[600px]  overflow-y-auto py-2">
-              <div className="h-[600px] w-full   grid grid-cols-1 lg:grid-cols-4 justify-items-center gap-x-8 gap-y-4 p-4">
+            <div className="flex gap-4 w-full flex-wrap max-h-[600px]  overflow-y-auto py-2">
+              <div className="max-h-[600px] w-full   grid grid-cols-1 lg:grid-cols-4 justify-items-center gap-x-8 gap-y-4 p-4">
                 {testData?.testData &&
                   testData?.testData?.map((test: ServerTestDataType) => {
                     const weekNumber = getWeekNumber(new Date(test.date));
@@ -565,8 +532,8 @@ export default function StudentDashboard() {
               <div className="text-sm font-medium text-red-600">
                 Attendance Rate:{" "}
                 {attendanceCount &&
-                  (attendanceCount.presentDays / attendanceCount.totalDays) *
-                    100}
+                  Math.ceil((attendanceCount.presentDays / attendanceCount.totalDays) *
+                  100)}
                 %
               </div>
             </CardFooter>
@@ -589,20 +556,7 @@ export default function StudentDashboard() {
                       less: "Less",
                       more: "More",
                     },
-                    months: [
-                      "Jan",
-                      "Feb",
-                      "Mar",
-                      "Apr",
-                      "May",
-                      "Jun",
-                      "Jul",
-                      "Aug",
-                      "Sep",
-                      "Oct",
-                      "Nov",
-                      "Dec",
-                    ],
+                    months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
                     weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
                     totalCount: "{{count}} activities in {{year}}",
                   }}

@@ -4,6 +4,7 @@ import "./globals.css";
 import QueryProvider from "@/utils/providers/QueryProvider";
 import { Toaster } from "react-hot-toast";
 import { JotaiProvider } from "@/utils/providers/JotaiProvider";
+import { EdgeStoreProvider } from "@/utils/edgestore";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,12 +31,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <EdgeStoreProvider>
         <JotaiProvider>
           <QueryProvider>
             {children}
             <Toaster />
           </QueryProvider>
         </JotaiProvider>
+        </EdgeStoreProvider>
       </body>
     </html>
   );

@@ -1,7 +1,9 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { getCollection } from "../lib/db/db";
-import { MessageModel } from "../models/messages.model";
-import { MessageTypeFromServer } from "../lib";
+import { MessageEditModel, MessageModel } from "../models/messages.model";
+
+
+
 
 const populateMessageDetails = async (message: MessageModel) => {
   const senderData = await getUserById(message.senderId);
@@ -58,10 +60,96 @@ const populateMessageDetails = async (message: MessageModel) => {
       codeName: receiverData.codeName,
     } : null,
     seenBy : SeenByUsers,
-    createdAt : message.createdAt
+    ...(message.replyTo && {replyTo : message.replyTo}),
+    ...(message.reactions && {reactions : message.reactions}),
+    createdAt : message.createdAt,
+    updatedAt : message.updatedAt,
   };
   return populatedMessage
 };
+
+
+
+export const  deleteMessageById = async(id : ObjectId) =>{
+  try {
+    const messageCollection = await getCollection("messages");
+    const deleteResult = await messageCollection.deleteOne({ _id: id });
+    if (deleteResult.deletedCount === 0) return null;
+    return true;
+  } catch (error) {
+    return null;
+  }
+
+}
+  
+
+
+
+export const getMessageById = async (id : ObjectId) =>{
+  try {
+    const messageCollection = await getCollection("messages")
+    const findMessage = await messageCollection.findOne({_id : id})
+    if(!findMessage)return null;
+    return findMessage;
+    
+  } catch (error) {
+    return null;
+    
+  }
+}
+
+
+
+export const EditMessage = async(message : MessageEditModel)=>{
+  try {
+    if(!message._id || !message.conversationId ){
+      return null;
+    }
+
+    const messageCollection = await getCollection("messages")
+    const result = await messageCollection.updateOne(
+      {
+        _id : message._id,
+        conversationId : message.conversationId,
+      },
+      {
+        $set : {
+          text : message.text,
+          updatedAt : new Date(),
+        }
+      }
+    )
+
+    if(result.matchedCount === 0){
+      return null;
+    }
+    
+    const doc = await getMessageById(message._id)
+    if(!doc)return null;
+    const messageModelMessage = {
+      _id: doc._id,
+      senderId: doc.senderId,
+      receiverId: doc.receiverId,
+      text: doc.text,
+      image: doc.image,
+      conversationId: doc.conversationId,
+      createdAt: doc.createdAt,
+      updatedAt : doc.updatedAt,
+      seenBy: doc.seenBy,
+      reactions: doc.reactions,
+      replyTo: doc.replyTo,
+    }
+    const populatedMessage = await populateMessageDetails(messageModelMessage)
+    return populatedMessage;
+      
+  } catch (error) {
+    return null;
+    
+  }
+  
+
+}
+
 
 export const createNewMessage = async (
   messageData: Omit<MessageModel, "_id">

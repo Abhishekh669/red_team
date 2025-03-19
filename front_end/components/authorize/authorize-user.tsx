@@ -62,7 +62,7 @@ export function OnboardingRequestCard({ request, onAccept, onReject, verifying, 
           </div>
           <div>
             <p className="text-sm font-semibold text-red-600">Field</p>
-            <p className="text-sm text-white">{request?.field}</p>
+            <p className="text-sm text-white max-w-[100px] truncate">{request?.field}</p>
           </div>
           <div>
             <p className="text-sm font-semibold text-red-600">Age</p>

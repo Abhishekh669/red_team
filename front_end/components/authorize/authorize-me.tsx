@@ -49,12 +49,12 @@ export default function AuthorizePage() {
         onSuccess: (res) => {
           if (res.message && res.status) {
             toast.success(res.message);
-          } else {
+          } else if(res.error) {
             toast.error(res.error);
           }
         },
         onError: (err) => {
-          toast.error(err);
+          toast.error((err as Error).message);
         },
       });
     }
@@ -72,7 +72,7 @@ export default function AuthorizePage() {
           }
         },
         onError: (err) => {
-          toast.error(err);
+          toast.error((err as Error).message);
         },
       });
     }

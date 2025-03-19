@@ -575,8 +575,8 @@ export default function AdminViewStudentDashboard() {
               <div className="text-sm font-medium text-red-600">
                 Attendance Rate:{" "}
                 {attendanceCount &&
-                  (attendanceCount.presentDays / attendanceCount.totalDays) *
-                    100}
+                  Math.ceil((attendanceCount.presentDays / attendanceCount.totalDays) *
+                  100)}
                 %
               </div>
             </CardFooter>

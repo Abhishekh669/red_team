@@ -10,8 +10,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { type Conversation, dummyUsers, type User } from "@/lib/dummy-data"
-import { toast } from "@/components/ui/use-toast"
 
 interface SidebarProps {
   conversations: Conversation[]

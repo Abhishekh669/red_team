@@ -1,9 +1,94 @@
 import { Request, Response } from "express";
-import { MessageModel } from "../models/messages.model";
-import { createNewMessage, getUserById } from "../services/message.services";
+import { MessageEditModel, MessageModel } from "../models/messages.model";
+import { createNewMessage, deleteMessageById, EditMessage, getMessageById, getUserById } from "../services/message.services";
 import { ObjectId } from "mongodb";
 import { getReceiverSocketId, io } from "../lib/socket";
 import { getConversationById } from "../services/chat.services";
+
+export const DeleteMessageHandler = async(req : Request, res : Response) =>{
+  try {
+    const messageId = req.params.id;
+    if(!messageId){
+      res.status(400).json({error : "invalid message id "})
+    }
+
+    console.log("this is messageid ; ",messageId)
+
+    const currentMessage = await getMessageById(new ObjectId(messageId))
+    if(!currentMessage) res.status(400).json({error : "no such message exists"})
+    const conversationDetails = await getConversationById(new ObjectId(currentMessage?.conversationId))
+    if(!conversationDetails) res.status(400).json({error : "no conversation exists"})
+
+    const deleteMessageResult = await deleteMessageById(new ObjectId(messageId));
+    console.log("this is my delete message : ",deleteMessageResult)
+
+    if(!deleteMessageResult) res.status(400).json({error : "failed to delete message id"})
+      console.log("i am fine hoi ", conversationDetails, currentMessage)
+    
+    const otherMembers = conversationDetails?.members.filter((u : ObjectId)=> !u.equals(currentMessage?.sender._id))
+    console.log("this is other memebers ",otherMembers)
+
+    otherMembers.forEach((u : ObjectId)=>{
+      const receiverId = getReceiverSocketId(u.toString())
+      if(receiverId){
+        io.to(receiverId).emit("deleteMessage",currentMessage)
+      }else{
+        console.log("Receiver is not online")
+      }
+    })
+    res.status(200).json({message : "successfully deleted message", successStatus : true})
+  } catch (error) {
+    res.status(400).json({error : "failed to delete message"})
+    
+  }
+}
+
+export const EditMessageHandler = async(req : Request, res : Response) =>{
+  try {
+    const data = req.body;
+    
+    if(!data.otherMembers || !data._id || data.otherMembers.length === 0){
+      res.status(400).json({error : "failed to get  message payload"})
+    }
+    
+    const {_id, senderId, text, conversationId, otherMembers} = req.body;
+    const checkUser = await getUserById(new ObjectId(senderId))
+    if(!checkUser){
+      res.status(400).json({error : "no user exists"})
+    }
+    const checkMesssage = await getMessageById(new ObjectId(_id))
+    if(!checkMesssage){
+      res.status(400).json({error : "failed to get message"})
+    }
+
+    const newEditMessageData : MessageEditModel = {
+      _id : new ObjectId(_id),
+      senderId : new ObjectId(senderId),
+      text,
+      conversationId : new ObjectId(conversationId),
+    }
+
+
+    const resutlAfterEdit = await EditMessage(newEditMessageData);
+    if(!resutlAfterEdit){
+      res.status(400).json({error : "failed to edit message"})
+    }
+
+
+    otherMembers.forEach((id : string)=>{
+      const receiverSocketId = getReceiverSocketId(id);
+      if(receiverSocketId){
+        io.to(receiverSocketId).emit("updateMessage", resutlAfterEdit);
+      } else{
+        console.log("Receiver is not connected")
+      }
+    })
+    
+    res.status(200).json({message  :"successflly updated the message", successStatus : true})
+  } catch (error) {
+    res.status(400).json({error : "failed to edit message"})
+  }
+}
 
 export const createNewMessageHandler = async (req: Request, res: Response) => {
   try {
@@ -24,21 +109,19 @@ export const createNewMessageHandler = async (req: Request, res: Response) => {
     }
     }
 
-    console.log("I am fine till here")
 
     const messageData: Omit<MessageModel, "_id"> = {
       senderId: new ObjectId(data.senderId),
       conversationId: new ObjectId(data.conversationId),
       createdAt: new Date(),
       seenBy: [new ObjectId(data.senderId)],
-      ...(data.receiverId && {receiverId : data.receiverId}),
+      ...(data.receiverId && {receiverId : new ObjectId(data.receiverId)}),
       ...(data.text && { text: data.text }),
       ...(data.image && { image: data.image }),
+      ...(data.replyTo && {replyTo : data.replyTo})
     };
 
-    console.log("this is messageData : ",messageData)
     const newMessage = await createNewMessage(messageData);
-    console.log("this is the new message in the express : ", newMessage);
 
     if (!newMessage) {
       res.status(400).json({ error: "failed to create message" });
@@ -52,10 +135,7 @@ export const createNewMessageHandler = async (req: Request, res: Response) => {
         if (!conversation) {
           res.status(400).json({ error: "conversation does not exists" });
         }
-        console.log(
-          "this is the conversation members : ",
-          conversation?.members
-        );
+       
         if (conversation?.isGroup) {
           const receiverMembers = conversation?.members.filter(
             (m: ObjectId) => !m.equals(newMessage.sender._id)

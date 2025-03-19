@@ -6,6 +6,23 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type Reactions struct {
+	Emoji string   `json:"emoji" bson:"emoji"`
+	Users []string `json:"users" bson:"users"`
+}
+
+type ReplyToSenderType struct {
+	ID    string `json:"_id" bson:"_id"`
+	Name  string `json:"name" bson:"name"`
+	Image string `json:"image" bson:"image"`
+}
+
+type ReplyToType struct {
+	ID     string            `json:"_id" bson:"_id"`
+	Text   string            `json:"text" bson:"text"`
+	Sender ReplyToSenderType `json:"sender" bson:"sender"`
+}
+
 type Message struct {
 	ID             primitive.ObjectID   `json:"_id,omitempty" bson:"_id,omitempty"`
 	ConversationId primitive.ObjectID   `json:"conversationId" bson:"conversationId"`
@@ -15,6 +32,8 @@ type Message struct {
 	Image          string               `json:"image,omitempty" bson:"image,omitempty"`
 	CreatedAt      time.Time            `json:"createdAt,omitempty" bson:"createdAt,omitempty"`
 	SeenBy         []primitive.ObjectID `json:"seenBy,omitempty" bson:"seenBy,omitempty"`
+	Reactions      []Reactions          `json:"reactions" bson:"reactions"`
+	ReplyTo        ReplyToType          `json:"replyTo" bson:"replyTo"`
 }
 
 // type MessageRequest struct {

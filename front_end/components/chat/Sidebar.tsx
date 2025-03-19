@@ -37,6 +37,7 @@ const Sidebar = () => {
   const { user } = useSessionStore();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchWorkspace, setSearchWorkspace] = useState("")
   const [isNewGroupOpen, setIsNewGroupOpen] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
@@ -58,37 +59,15 @@ const Sidebar = () => {
   const { onlineUsers, setSelectedChat } = useSocketIOStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
-  // const otherUserData = useMemo(() => {
-  //   if (isConversationLoading || !conversations) return [];
-  //   return conversations
-  //     ?.filter((c)=>{
-  //       if(c.isGroup || c.name || c.groupImage){
-  //         setGroupConversation((prev : any)=> [...prev, c ])
-  //       }else{
-  //         return c
-  //       }
-  //     })
-  //     ?.map((conversation) => {
-  //       let otherUser = conversation.members.filter(
-  //         (member: UserInMessageType) => member._id !== user?._id
-  //       )[0];
-  //       otherUser = { ...otherUser, conversationId: conversation._id };
-  //       return otherUser || null;
-  //     })
-  //     .filter((userData: UserForConversation) =>
-  //       userData.name.toLowerCase().includes(searchTerm.toLowerCase())
-  //     )
-  //     .filter(Boolean);
-  // }, [user, isConversationLoading, conversations, searchTerm]);
-
   useEffect(() => {
     if (conversations) {
       const groupConversations = conversations.filter(
-        (c) => c.isGroup || c.name || c.groupImage
+        (c) => (c.isGroup || c.name || c.groupImage) &&
+        (!searchWorkspace || c.name?.toLowerCase().includes(searchWorkspace.toLowerCase()))
       );
       setGroupConversation(groupConversations);
     }
-  }, [conversations]); // Only update when conversations change
+  }, [conversations, searchWorkspace]); // Only update when conversations change
   
   const otherUserData = useMemo(() => {
     if (isConversationLoading || !conversations) return [];
@@ -348,9 +327,9 @@ const Sidebar = () => {
             className={`px-2 ${!isHovered && "sm:hidden md:hidden"} lg:block`}
           >
             <Input
-              placeholder="Search chats"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search workspace"
+              value={searchWorkspace}
+              onChange={(e) => setSearchWorkspace(e.target.value)}
             />
           </div>
           <ScrollArea>

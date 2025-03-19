@@ -50,7 +50,7 @@ export default function UserAbsenceRecords() {
       onSuccess : (res) =>{
         if(res.message && res.status){
           toast.success(res.message)
-        }else{
+        }else if(res.error){
           toast.error(res.error)
         }
       }, onError : () =>{
@@ -67,7 +67,7 @@ export default function UserAbsenceRecords() {
       onSuccess : (res) =>{
         if(res.message && res.status){
           toast.success(res.message)
-        }else{
+        }else if(res.error){
           toast.error(res.error)
         }
       }, onError : () =>{
@@ -138,7 +138,7 @@ export default function UserAbsenceRecords() {
             </p>
           </div>
         </header>
-        <Card className="border-red-600 bg-gray-900 text-white shadow-lg">
+          <Card className="border-red-600 bg-slate-950 text-white shadow-lg">
           <CardHeader className="border-b border-red-800 pb-4">
             <CardTitle className="text-2xl font-bold text-red-600">
               Absence History
@@ -150,13 +150,13 @@ export default function UserAbsenceRecords() {
                 No absence records found for this user.
               </p>
             ) : (
-              <div className="space-y-4 grid grid-col-1 md:grid-cols-3">
+              <div className="flex flex-wrap gap-x-4 gap-y-4">
                 {userAbsentRequests?.userAbsentRequest &&
                   userAbsentRequests?.userAbsentRequest?.map(
                     (record: AbsentRequestType) => (
                       <Card
                         key={record._id}
-                        className="border-gray-800 bg-gray-800 hover:border-red-500 transition-all md:max-w-[400px]  md:w-[350px] md:h-[200px]"
+                        className="border-gray-900 bg-gray-800 hover:border-red-500 transition-all md:max-w-[400px]  md:w-[350px] md:h-[200px]"
                       >
                         <CardHeader className="pb-2">
                           <div className="flex justify-between items-start ">
@@ -167,17 +167,19 @@ export default function UserAbsenceRecords() {
                             {getStatusBadge(record.status)} 
                           </div>
                         </CardHeader>
-                        <CardContent className="flex flex-col gap-y-8   ">
+                        <CardContent className="flex flex-col justify-between gap-y-8   ">
                           <div>
-                          <p className="text-sm text-gray-400 mb-2">
+                          <p className="text-sm text-gray-400 mb-2  ">
                             {record.reason}
                           </p>
+                          <div >
                           <p className="text-xs text-gray-500">
                             Created: {format(record.createdAt, "Pp")}
                           </p>
                           <p className="text-xs text-gray-500">
                             Last Updated: {format(record.updatedAt, "Pp")}
                           </p>
+                          </div>
                           </div>
                           <div>
                             {

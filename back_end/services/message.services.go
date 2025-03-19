@@ -72,6 +72,8 @@ func populateMessageDetails(message model.Message) (bson.M, error) {
 			"image":    receiver.Image,
 			"codeName": receiver.CodeName,
 		},
+		"replyTo":   message.ReplyTo,
+		"image":     message.Image,
 		"seenBy":    seenByUsers,
 		"createdAt": message.CreatedAt, // Here, it's an array of strings instead of ObjectIDs
 	}
@@ -140,9 +142,11 @@ func populatedMessagesDetails(message bson.M) (bson.M, error) {
 			"image":    receiver.Image,
 			"codeName": receiver.CodeName,
 		},
+		"replyTo": message["replyTo"],
 
 		"seenBy":    seenByUsers,
 		"createdAt": message["createdAt"],
+		"updatedAt": message["updatedAt"],
 	}
 	return populatedMessage, nil
 }
@@ -202,6 +206,7 @@ func GetAllConversationMessages(id primitive.ObjectID, lastID primitive.ObjectID
 	}
 
 	reverseMessages(messages)
+	fmt.Println("this is messages : ", messages)
 
 	response := map[string]interface{}{
 		"messages":      messages,
@@ -236,6 +241,7 @@ func CreateMesssage(message model.Message) (map[string]interface{}, error) {
 	if err != nil {
 		return map[string]interface{}{}, fmt.Errorf("failed to populate message details: %v", err)
 	}
+	fmt.Println("this is after created message: ", populatedMessage)
 	return populatedMessage, nil
 }
 

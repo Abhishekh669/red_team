@@ -43,21 +43,15 @@ import { useGetSession } from "@/utils/hooks/query-hooks/sessions/use-get-sessio
 import { useGetAdminByToken } from "@/utils/hooks/query-hooks/admin/use-get-admin-by-token";
 
 const UserDashboard: React.FC = () => {
-    const {data : session} = useGetSession();
+  const { data: session } = useGetSession();
   const { data: all_users, isLoading: users_loading } = useGetUsers();
   const [users, setUsers] = useState<UserType[]>([]);
-  const { isLoading : admin_loading} = useGetAdminByToken();
+  const { isLoading: admin_loading } = useGetAdminByToken();
   const [filteredUsers, setFilteredUsers] = useState<UserType[]>([]);
-  const {mutate : delete_user} = useDeleteUser()
-  const {mutate : set_or_delete_user} = useSetOrDeleteUser()
+  const { mutate: delete_user } = useDeleteUser();
+  const { mutate: set_or_delete_user } = useSetOrDeleteUser();
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
-
-
-
-  
-
-  
 
   // useEffect(() =>{
   //   if(checkToken){
@@ -96,77 +90,71 @@ const UserDashboard: React.FC = () => {
   }, [users, filter, search]);
 
   const handleSetOrRemove = (userId: string) => {
-    if(!userId || admin_loading || users_loading){
-        toast.error("Wait some moments")
-        return
-    };
-    if(!session?.user?.isAdmin){
-      toast.error("not authorized")
-      return
+    if (!userId || admin_loading || users_loading) {
+      toast.error("Wait some moments");
+      return;
     }
-    set_or_delete_user({userId, currentUserId : session?.user?._id},{
-        onSuccess : (res) =>{
-            if(res.status && res.message){
-                toast.success(res.message);
-               
-            } else{
-                toast.error(res.error)
-            }
-
+    if (!session?.user?.isAdmin) {
+      toast.error("not authorized");
+      return;
+    }
+    set_or_delete_user(
+      { userId, currentUserId: session?.user?._id },
+      {
+        onSuccess: (res) => {
+          if (res.status && res.message) {
+            toast.success(res.message);
+          } else if (res.error) {
+            toast.error(res.error);
+          }
         },
-        onError : () =>{
-            toast.error("fialed to update ")
-        }
-    })
-     
-
+        onError: () => {
+          toast.error("fialed to update ");
+        },
+      }
+    );
   };
 
   const handleDeleteUser = (id: string) => {
-    if(!id) return;
-    if(!session?.user?.isAdmin){
-      toast.error("not authorized")
-      return
+    if (!id) return;
+    if (!session?.user?.isAdmin) {
+      toast.error("not authorized");
+      return;
     }
-    delete_user(id,{
-        onSuccess : (res) =>{
-            if(res.status && res.message){
-                toast.success(res.message);
-            } else{
-                toast.error(res.error)
-            }
-
-        },
-        onError : () =>{
-            toast.error("fialed to update ")
+    delete_user(id, {
+      onSuccess: (res) => {
+        if (res.status && res.message) {
+          toast.success(res.message);
+        } else if (res.error) {
+          toast.error(res.error as string);
         }
-    })
+      },
+      onError: () => {
+        toast.error("fialed to update ");
+      },
+    });
   };
 
   const handleVisitUser = (userId: string) => {
     // This would typically navigate to a user profile page
-    console.log("this ishte user id : ",userId)
+    console.log("this ishte user id : ", userId);
     toast.success("set to admin successfully");
   };
 
- 
-
   return (
-    <div className="flex h-full bg-gray-900 text-gray-100 ">
-
+    <div className="flex h-full bg-black text-gray-100 ">
       {/* Main content */}
       <div className="flex-1 flex flex-col ">
         {/* User list */}
-        <main className="flex-1  overflow-y-auto bg-gray-900 p-6">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1  overflow-y-auto  p-6">
+          <div className="max-w-7xl mx-auto bg-slate-950 p-2 rounded-md">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-gray-100 text-2xl font-semibold">Users</h3>
-             
             </div>
 
             <div className="flex space-x-4 mb-6">
               <Select onValueChange={setFilter} defaultValue="all">
-                <SelectTrigger className="w-[180px] bg-gray-800 border-gray-700 text-gray-100">
+                <SelectTrigger className="w-[180px] bg-gray-900 border-gray-700 text-gray-100">
                   <SelectValue placeholder="Filter users" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700 text-gray-100">
@@ -182,7 +170,7 @@ const UserDashboard: React.FC = () => {
                   placeholder="Search users..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full bg-gray-800 border-gray-700 text-gray-100 pl-10"
+                  className="w-full bg-gray-900 border-gray-700 text-gray-100 pl-10"
                 />
                 <Search
                   className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -194,11 +182,11 @@ const UserDashboard: React.FC = () => {
             {users_loading ? (
               <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
-                  <Skeleton key={i} className="h-12 w-full bg-gray-800" />
+                  <Skeleton key={i} className="h-12 w-full bg-gray-900" />
                 ))}
               </div>
             ) : filteredUsers.length > 0 ? (
-              <div className="bg-gray-800 rounded-lg ">
+              <div className="bg-gray-900 rounded-lg ">
                 <Table>
                   <TableHeader>
                     <TableRow className="border-b hover:bg-gray-800 border-gray-700 ">
@@ -226,8 +214,11 @@ const UserDashboard: React.FC = () => {
                             </Avatar>
                           </TableCell>
                           <TableCell>
-                          <span className="text-gray-100 truncate">
-                              {user?.name} {user?._id == session?.user?._id && (<span>(you)</span>)}
+                            <span className="text-gray-100 truncate">
+                              {user?.name}{" "}
+                              {user?._id == session?.user?._id && (
+                                <span>(you)</span>
+                              )}
                             </span>
                           </TableCell>
                           <TableCell className="text-gray-300 max-w-[150px] truncate ">
@@ -248,7 +239,6 @@ const UserDashboard: React.FC = () => {
                                   Verified
                                 </Badge>
                               )}
-                              
                             </div>
                           </TableCell>
                           <TableCell className="max-w-[120px] truncate">
@@ -263,25 +253,25 @@ const UserDashboard: React.FC = () => {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent className="w-56 bg-gray-800 border-gray-700 text-gray-100">
-                                {
-                                  (user?._id !== session?.user?._id) && (
-                                    <>
-                                      <DropdownMenuItem
-                                  onClick={() => handleSetOrRemove(user?._id)}
-                                  className="hover:bg-gray-700"
-                                >
-                                  <UserPlus className="mr-2 h-4 w-4" />
-                                  <span>
-                                    {user?.isAdmin
-                                      ? "Remove Admin"
-                                      : "Set as Admin"}
-                                  </span>
-                                </DropdownMenuItem>
-                                    </>
-                                  )
-                                }
-                               
-                                     <DropdownMenuItem
+                                {user?._id !== session?.user?._id && (
+                                  <>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        handleSetOrRemove(user?._id)
+                                      }
+                                      className="hover:bg-gray-700"
+                                    >
+                                      <UserPlus className="mr-2 h-4 w-4" />
+                                      <span>
+                                        {user?.isAdmin
+                                          ? "Remove Admin"
+                                          : "Set as Admin"}
+                                      </span>
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
+
+                                <DropdownMenuItem
                                   onClick={() => handleVisitUser(user?._id)}
                                   className="hover:bg-gray-700"
                                 >
@@ -289,19 +279,19 @@ const UserDashboard: React.FC = () => {
                                   <span>Visit User</span>
                                 </DropdownMenuItem>
 
-                                {
-                                (user?._id !== session?.user?._id) && (
+                                {user?._id !== session?.user?._id && (
                                   <>
-                                <DropdownMenuItem
-                                  onClick={() => handleDeleteUser(user?._id)}
-                                  className="text-rose-500 hover:bg-gray-700 hover:text-rose-500"
-                                >
-                                  <Trash className="mr-2 h-4 w-4" />
-                                  <span>Delete User</span>
-                                </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        handleDeleteUser(user?._id)
+                                      }
+                                      className="text-rose-500 hover:bg-gray-700 hover:text-rose-500"
+                                    >
+                                      <Trash className="mr-2 h-4 w-4" />
+                                      <span>Delete User</span>
+                                    </DropdownMenuItem>
                                   </>
-                                )
-                               }
+                                )}
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>

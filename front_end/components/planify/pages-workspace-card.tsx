@@ -20,6 +20,7 @@ import { useDeletePageWorkspace } from "@/utils/hooks/mutate-hooks/planify/pages
 import { useUpdatePageWorkspace } from "@/utils/hooks/mutate-hooks/planify/pages/use-update-page-workspace"
 import useConfirm from "@/utils/hooks/use-confirm"
 import toast from "react-hot-toast"
+import { useRouter } from "next/navigation"
 
 
 interface WorkspaceCardProps {
@@ -27,6 +28,7 @@ interface WorkspaceCardProps {
 }
 
 export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
+  const router = useRouter()
   const [ConfirmDialog, confirm] = useConfirm(
     "Are you sure?",
     "This action is irreversible"
@@ -127,7 +129,9 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
       <CardContent>
         <p className="text-sm text-slate-300">{workspace.description}</p>
       </CardContent>
-      <CardFooter>
+      <CardFooter
+        onMouseEnter={()=>router.prefetch(`/planify/pages/${workspace._id}`)}
+      >
         <Link href={`/planify/pages/${workspace._id}`} className="w-full">
           <Button
             variant="outline"
